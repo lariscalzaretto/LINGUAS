@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lingua — English, Chinese & Korean</title>
+<style>
+:root{--bg:#08080a;--surface:#0e0e11;--surface2:#15151a;--border:rgba(255,255,255,0.05);--border2:rgba(255,255,255,0.08);--text:#e2e2e8;--text2:#68687e;--text3:#3e3e52;--zh:#7c6fe0;--zh-s:rgba(124,111,224,0.08);--ko:#d96d8a;--ko-s:rgba(217,109,138,0.08);--en:#68b3c4;--en-s:rgba(104,179,196,0.08);--r:10px;--rs:6px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px}
+.logo{font-size:17px;font-weight:600;letter-spacing:-.4px}.logo span{color:var(--zh)}
+.header-right{display:flex;align-items:center;gap:16px}
+.streak{font-size:12px;color:var(--text3)}
+.lv-wrap{display:flex;align-items:center;gap:7px}
+.lv-badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.3px;transition:background .3s,color .3s}
+.lv-badge.zh{background:var(--zh-s);color:var(--zh)}.lv-badge.ko{background:var(--ko-s);color:var(--ko)}.lv-badge.en{background:var(--en-s);color:var(--en)}
+.lv-xp{font-size:11px;color:var(--text3)}
+
+.lang-tabs{display:flex;gap:0;padding:0 28px;border-bottom:1px solid var(--border)}
+.lang-tab{padding:11px 18px;border:none;border-bottom:2px solid transparent;cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text3);transition:all .2s;margin-bottom:-1px}
+.lang-tab:hover{color:var(--text2)}
+.lang-tab.act-zh{color:var(--zh);border-bottom-color:var(--zh)}
+.lang-tab.act-ko{color:var(--ko);border-bottom-color:var(--ko)}
+.lang-tab.act-en{color:var(--en);border-bottom-color:var(--en)}
+
+main{flex:1;display:flex;flex-direction:column;max-width:820px;margin:0 auto;width:100%;padding:28px;gap:20px}
+
+.mode-bar{display:flex;gap:2px;flex-wrap:wrap}
+.mode-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;border:none;background:transparent;color:var(--text3);font-size:13px;cursor:pointer;transition:all .2s}
+.mode-btn:hover{color:var(--text2);background:var(--surface)}
+.mode-btn.active{background:var(--surface2);color:var(--text)}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--text3)}
+.mode-btn.active .dz{background:var(--zh)}.mode-btn.active .dk{background:var(--ko)}.mode-btn.active .de{background:var(--en)}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+
+.fc-area{padding:36px 28px;display:flex;flex-direction:column;align-items:center;gap:24px}
+.cat-pills{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.pill{padding:4px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:color .2s}
+.pill:hover{color:var(--text2)}
+.pill.pz{color:var(--zh)}.pill.pk{color:var(--ko)}.pill.pe{color:var(--en)}
+
+.card-wrap{perspective:1000px;width:100%;max-width:460px;height:240px}
+.card-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;cursor:pointer}
+.card-inner.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:28px;background:var(--surface2)}
+.card-back{transform:rotateY(180deg)}
+.c-char{font-size:52px;line-height:1;font-weight:300;text-align:center}
+.c-rom{font-size:13px;color:var(--text2);font-style:italic}
+.c-mean{font-size:22px;font-weight:500}
+.c-ex{font-size:13px;color:var(--text2);text-align:center;line-height:1.7;white-space:pre-line}
+.c-hint{font-size:10px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase}
+
+.card-btns{display:flex;gap:8px;align-items:center}
+.abtn{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--rs);border:none;background:var(--surface2);color:var(--text2);font-size:13px;cursor:pointer;transition:color .2s}
+.abtn:hover{color:var(--text)}
+.abtn.wrong{color:rgba(217,100,100,.7)}
+.abtn.right{color:rgba(100,190,100,.7)}
+
+.pbar{width:100%;max-width:460px;height:1px;background:var(--border2)}
+.pfill{height:100%;transition:width .4s;background:var(--zh)}
+.pfill.ko{background:var(--ko)}.pfill.en{background:var(--en)}
+.ccnt{font-size:10px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase}
+
+.sh-area{padding:28px;display:flex;flex-direction:column;gap:20px}
+.sh-box{background:var(--surface2);border-radius:var(--r);padding:32px;text-align:center}
+.sh-native{font-size:28px;font-weight:300;margin-bottom:8px;line-height:1.3}
+.sh-rom{font-size:13px;color:var(--text2);font-style:italic;margin-bottom:6px}
+.sh-en{font-size:13px;color:var(--text3)}
+.sh-ctrl{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.sh-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--rs);border:none;background:var(--surface2);color:var(--text2);font-size:13px;cursor:pointer;transition:color .2s}
+.sh-btn:hover{color:var(--text)}
+.sh-btn.pz{background:var(--zh);color:#fff}.sh-btn.pk{background:var(--ko);color:#fff}.sh-btn.pe{background:var(--en);color:#fff}
+.sh-btn.rec{color:#d96d6d;animation:pulse 1s infinite}
+.sh-res{border-radius:var(--rs);padding:14px 18px;font-size:14px;line-height:1.6;display:none}
+.sh-res.show{display:block}
+.sh-res.good{border-left:2px solid rgba(100,190,100,.5);padding-left:16px}
+.sh-res.bad{border-left:2px solid rgba(217,100,100,.5);padding-left:16px}
+.sh-res.ok{border-left:2px solid rgba(245,158,11,.5);padding-left:16px}
+.sh-score{font-size:18px;font-weight:600;margin-bottom:4px}
+.sh-score.g{color:#6fbe6f}.sh-score.b{color:#d96d6d}.sh-score.o{color:#f59e0b}
+.sh-heard{font-size:12px;color:var(--text2)}
+.sh-tip{font-size:11px;color:var(--text3);text-align:center;letter-spacing:.3px}
+
+.chat-area{display:flex;flex-direction:column;height:480px}
+.chat-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.chat-hdr-info{display:flex;align-items:center;gap:10px}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.av.zh{background:var(--zh-s);color:var(--zh)}.av.ko{background:var(--ko-s);color:var(--ko)}.av.en{background:var(--en-s);color:var(--en)}
+.ai-name{font-size:13px;font-weight:500}.ai-sub{font-size:11px;color:var(--text3)}
+.sc-sel{background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:12px;padding:5px 10px;border-radius:var(--rs);cursor:pointer;outline:none}
+.msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:3px}.msgs::-webkit-scrollbar-thumb{background:var(--border2)}
+.msg{display:flex;gap:8px;max-width:86%;animation:fu .2s ease}
+@keyframes fu{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.bubble{padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.6}
+.msg.ai .bubble{background:var(--surface2);border-radius:4px 14px 14px 14px}
+.msg.user .bubble{background:var(--zh-s);border-radius:14px 4px 14px 14px}
+.msg.user .bubble.ko{background:var(--ko-s)}.msg.user .bubble.en{background:var(--en-s)}
+.spkbtn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px;align-self:flex-end;margin-bottom:4px;flex-shrink:0;transition:color .15s}
+.spkbtn:hover{color:var(--text2)}
+.typing{display:none;align-items:center;gap:4px;padding:11px 15px;background:var(--surface2);border-radius:4px 14px 14px 14px;width:fit-content}
+.typing.on{display:flex}
+.tdot{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:tb 1.2s infinite ease-in-out}
+.tdot:nth-child(2){animation-delay:.2s}.tdot:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+.chat-inp-area{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end}
+.inp-wrap{flex:1;display:flex;align-items:center;background:var(--surface2);border-radius:10px;padding:8px 12px;gap:8px}
+.chat-inp{flex:1;background:none;border:none;color:var(--text);font-size:14px;outline:none;resize:none;font-family:inherit;line-height:1.5;max-height:80px}
+.chat-inp::placeholder{color:var(--text3)}
+.mic-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:4px;transition:color .2s}
+.mic-btn:hover{color:var(--text2)}.mic-btn.rec{color:#d96d6d;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.send-btn{background:var(--zh);border:none;color:#fff;font-size:14px;width:34px;height:34px;border-radius:8px;cursor:pointer;transition:opacity .2s;flex-shrink:0}
+.send-btn:hover{opacity:.8}.send-btn.ko{background:var(--ko)}.send-btn.en{background:var(--en)}.send-btn:disabled{opacity:.3;cursor:not-allowed}
+
+.les-area{padding:24px;display:flex;flex-direction:column;gap:18px}
+.les-hdr{display:flex;justify-content:space-between;align-items:center}
+.les-title{font-size:15px;font-weight:600}
+.les-badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;letter-spacing:.5px;text-transform:uppercase}
+.les-badge.zh{background:var(--zh-s);color:var(--zh)}.les-badge.ko{background:var(--ko-s);color:var(--ko)}.les-badge.en{background:var(--en-s);color:var(--en)}
+.phrase-list{display:flex;flex-direction:column}
+.phrase-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);transition:opacity .2s}
+.phrase-item:last-child{border-bottom:none}
+.phrase-item:hover{opacity:.7}
+.ph-main{flex:1}.ph-nat{font-size:18px;font-weight:300;margin-bottom:2px}.ph-rom{font-size:11px;color:var(--text3);margin-bottom:2px}.ph-en{font-size:12px;color:var(--text2)}
+.ph-spk{background:transparent;border:none;color:var(--text3);cursor:pointer;padding:8px;font-size:15px;transition:color .2s;flex-shrink:0}
+.ph-spk:hover{color:var(--text2)}
+
+.api-note{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 16px;font-size:13px;color:var(--text2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.api-note input{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:13px;padding:5px 10px;outline:none;flex:1;min-width:200px;font-family:monospace}
+.api-save{background:var(--zh);border:none;color:#fff;font-size:12px;padding:5px 14px;border-radius:6px;cursor:pointer}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);color:var(--text);padding:9px 20px;border-radius:20px;font-size:13px;transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:100;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Lin<span>gua</span></div>
+  <div class="header-right">
+    <div class="lv-wrap">
+      <span class="lv-badge zh" id="lv-badge">Lv.1 Novice</span>
+      <span class="lv-xp" id="lv-xp">0 / 20</span>
+    </div>
+    <div class="streak">🔥 <span id="stk">0 day streak</span></div>
+  </div>
+</header>
+<div class="lang-tabs">
+  <button class="lang-tab act-zh" onclick="switchLang('zh')">🇨🇳 中文 Chinese</button>
+  <button class="lang-tab" onclick="switchLang('ko')">🇰🇷 한국어 Korean</button>
+  <button class="lang-tab" onclick="switchLang('en')">🇬🇧 English</button>
+</div>
+<main>
+  <div class="api-note" id="api-note">
+    <span>🔑</span><span>Google Gemini API key:</span>
+    <input type="password" id="api-inp" placeholder="AIzaSy..." />
+    <button class="api-save" onclick="saveKey()">Save</button>
+  </div>
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="switchMode('flash')" id="mb-flash"><span class="dot dz" id="d-flash"></span>Flashcards</button>
+    <button class="mode-btn" onclick="switchMode('shadow')" id="mb-shadow"><span class="dot dz" id="d-shadow"></span>Shadowing</button>
+    <button class="mode-btn" onclick="switchMode('chat')" id="mb-chat"><span class="dot dz" id="d-chat"></span>AI Chat</button>
+    <button class="mode-btn" onclick="switchMode('lesson')" id="mb-lesson"><span class="dot dz" id="d-lesson"></span>Phrases</button>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div class="panel" id="p-flash">
+    <div class="fc-area">
+      <div class="cat-pills" id="cat-pills"></div>
+      <div class="card-wrap">
+        <div class="card-inner" id="ci" onclick="flipCard()">
+          <div class="card-face"><div class="c-char" id="cc"></div><div class="c-rom" id="cr"></div><div class="c-hint">tap to reveal</div></div>
+          <div class="card-face card-back"><div class="c-mean" id="cm"></div><div class="c-ex" id="ce"></div><div class="c-hint">how did you do?</div></div>
+        </div>
+      </div>
+      <div class="pbar"><div class="pfill" id="pf" style="width:0%"></div></div>
+      <div class="ccnt" id="cnt">Card 1 of 4</div>
+      <div class="card-btns" id="btns-f"><button class="abtn" onclick="speakCur()">🔊 Listen</button><button class="abtn" onclick="flipCard()">Flip →</button></div>
+      <div class="card-btns hidden" id="btns-b"><button class="abtn wrong" onclick="nextCard(false)">✗ Again</button><button class="abtn" onclick="speakCur()">🔊</button><button class="abtn right" onclick="nextCard(true)">✓ Got it</button></div>
+    </div>
+  </div>
+
+  <!-- SHADOWING -->
+  <div class="panel hidden" id="p-shadow">
+    <div class="sh-area">
+      <div class="sh-box">
+        <div class="sh-native" id="sh-nat"></div>
+        <div class="sh-rom" id="sh-rom"></div>
+        <div class="sh-en" id="sh-en"></div>
+      </div>
+      <div class="sh-ctrl">
+        <button class="sh-btn" onclick="prevSh()">← Prev</button>
+        <button class="sh-btn pz" id="sh-listen" onclick="listenSh()">🔊 Listen</button>
+        <button class="sh-btn" id="sh-rec" onclick="toggleShMic()">🎤 Repeat</button>
+        <button class="sh-btn" onclick="nextSh()">Next →</button>
+      </div>
+      <div class="sh-res" id="sh-res"><div class="sh-score" id="sh-score"></div><div class="sh-heard" id="sh-heard"></div></div>
+      <div class="sh-tip">Listen → repeat out loud → see how close you got</div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="panel hidden" id="p-chat">
+    <div class="chat-area">
+      <div class="chat-hdr">
+        <div class="chat-hdr-info">
+          <div class="av zh" id="av">李</div>
+          <div><div class="ai-name" id="ai-name">Li Wei — 李威</div><div class="ai-sub" id="ai-sub">Native Mandarin speaker • Patient tutor</div></div>
+        </div>
+        <select class="sc-sel" id="sc-sel" onchange="changeScenario()">
+          <option value="free">Free conversation</option>
+          <option value="cafe">☕ Café</option>
+          <option value="market">🛒 Shopping</option>
+          <option value="greet">👋 Greetings</option>
+          <option value="directions">🗺️ Directions</option>
+          <option value="special" id="sp-opt">⭐ Special</option>
+        </select>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="chat-inp-area">
+        <div class="inp-wrap">
+          <textarea class="chat-inp" id="ci2" rows="1" placeholder="Type in English or try the language..." onkeydown="chatKey(event)" oninput="resize(this)"></textarea>
+          <button class="mic-btn" id="mic" onclick="toggleMic()" title="Voice input">🎤</button>
+        </div>
+        <button class="send-btn" id="send" onclick="sendMsg()">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LESSONS -->
+  <div class="panel hidden" id="p-lesson">
+    <div class="les-area">
+      <div class="les-hdr"><div class="les-title" id="les-title">Essential Phrases</div><div class="les-badge zh" id="les-badge">Beginner</div></div>
+      <div class="phrase-list" id="ph-list"></div>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const D = {
+  zh:{
+    voiceLang:'zh-CN',chatAv:'李',chatName:'Li Wei — 李威',chatSub:'Native Mandarin speaker • Patient tutor',
+    spLabel:'🌐 Internet Slang',
+    sys(s){
+      const b=`You are Li Wei, a friendly native Mandarin Chinese tutor. Student speaks advanced English and is a beginner in Mandarin.
+- Write every Chinese phrase as: 汉字 (pīnyīn) [English meaning]
+- Gently correct mistakes inline
+- Use simplified characters
+- 2-4 sentences max, warm and encouraging`;
+      return ({free:b+'\nGreet student in Chinese and invite them to chat.',cafe:b+'\nScene: You are a barista at a cozy Beijing café. Student walks in. Start the scene.',market:b+'\nScene: You sell fruit at a Shanghai market. Student approaches your stand.',greet:b+'\nFocus only on greetings and introductions. Start by greeting the student.',directions:b+'\nScene: Student is lost in Beijing and needs help finding the metro. Teach direction words.',special:b+'\nTeach popular Chinese internet slang and Gen-Z expressions (绝绝子, yyds, 破防, 打call, etc.) with examples.'})[s]||b;
+    },
+    cats:['Greetings','Numbers','Food','Travel','Daily Life'],
+    cards:{
+      'Greetings':[
+        {n:'你好',r:'nǐ hǎo',m:'Hello',e:'你好！很高兴认识你。\nHello! Nice to meet you.'},
+        {n:'谢谢',r:'xiè xiè',m:'Thank you',e:'谢谢你的帮助！\nThank you for your help!'},
+        {n:'再见',r:'zài jiàn',m:'Goodbye',e:'再见！明天见。\nGoodbye! See you tomorrow.'},
+        {n:'对不起',r:'duì bù qǐ',m:"I'm sorry",e:'对不起，我迟到了。\nSorry, I\'m late.'}
+      ],
+      'Numbers':[
+        {n:'一',r:'yī',m:'One',e:'我要一杯咖啡。\nI want one coffee.'},
+        {n:'十',r:'shí',m:'Ten',e:'十分钟后见。\nSee you in ten minutes.'},
+        {n:'百',r:'bǎi',m:'Hundred',e:'一百块钱。\nOne hundred yuan.'},
+        {n:'多少',r:'duō shǎo',m:'How much / many',e:'这个多少钱？\nHow much is this?'}
+      ],
+      'Food':[
+        {n:'饺子',r:'jiǎo zi',m:'Dumplings',e:'我喜欢吃饺子！\nI love eating dumplings!'},
+        {n:'好吃',r:'hǎo chī',m:'Delicious',e:'这个饭很好吃！\nThis is so delicious!'},
+        {n:'菜单',r:'cài dān',m:'Menu',e:'请给我菜单。\nPlease give me the menu.'},
+        {n:'水',r:'shuǐ',m:'Water',e:'请给我一杯水。\nA glass of water, please.'}
+      ],
+      'Travel':[
+        {n:'地铁',r:'dì tiě',m:'Subway / Metro',e:'地铁站在哪里？\nWhere is the metro station?'},
+        {n:'酒店',r:'jiǔ diàn',m:'Hotel',e:'我住在这个酒店。\nI\'m staying at this hotel.'},
+        {n:'左',r:'zuǒ',m:'Left',e:'请往左转。\nPlease turn left.'},
+        {n:'右',r:'yòu',m:'Right',e:'邮局在右边。\nThe post office is on the right.'}
+      ],
+      'Daily Life':[
+        {n:'没问题',r:'méi wèn tí',m:'No problem',e:'没问题！我来帮你。\nNo problem! I\'ll help you.'},
+        {n:'我不懂',r:'wǒ bù dǒng',m:"I don't understand",e:'对不起，我不懂。\nSorry, I don\'t understand.'},
+        {n:'慢点说',r:'màn diǎn shuō',m:'Speak slowly please',e:'请慢点说，谢谢。\nPlease speak slowly, thanks.'},
+        {n:'我爱你',r:'wǒ ài nǐ',m:'I love you',e:'妈妈，我爱你！\nMom, I love you!'}
+      ]
+    },
+    lessons:[
+      {n:'你好',r:'nǐ hǎo',m:'Hello'},
+      {n:'谢谢',r:'xiè xiè',m:'Thank you'},
+      {n:'对不起',r:'duì bù qǐ',m:"I'm sorry / Excuse me"},
+      {n:'我叫...',r:'wǒ jiào...',m:'My name is...'},
+      {n:'多少钱？',r:'duō shǎo qián?',m:'How much does it cost?'},
+      {n:'在哪里？',r:'zài nǎlǐ?',m:'Where is...?'},
+      {n:'我不会说中文',r:'wǒ bù huì shuō zhōngwén',m:"I can't speak Chinese"},
+      {n:'请再说一遍',r:'qǐng zài shuō yī biàn',m:'Please say it again'}
+    ],
+    shadow:[
+      {n:'你好，很高兴认识你！',r:'nǐ hǎo, hěn gāoxìng rènshí nǐ!',m:'Hello, nice to meet you!'},
+      {n:'这个多少钱？',r:'zhège duōshǎo qián?',m:'How much is this?'},
+      {n:'我想要一杯咖啡。',r:'wǒ xiǎng yào yī bēi kāfēi.',m:'I would like a cup of coffee.'},
+      {n:'请问，地铁站在哪里？',r:'qǐngwèn, dìtiě zhàn zài nǎlǐ?',m:'Excuse me, where is the metro?'},
+      {n:'谢谢你的帮助！',r:'xièxie nǐ de bāngzhù!',m:'Thank you for your help!'},
+      {n:'对不起，我不会说中文。',r:'duìbuqǐ, wǒ bù huì shuō zhōngwén.',m:"Sorry, I can't speak Chinese."},
+      {n:'我爱吃中国菜。',r:'wǒ ài chī zhōngguó cài.',m:'I love eating Chinese food.'},
+      {n:'再见！明天见！',r:'zàijiàn! míngtiān jiàn!',m:'Goodbye! See you tomorrow!'}
+    ]
+  },
+  ko:{
+    voiceLang:'ko-KR',chatAv:'지',chatName:'Ji-ho — 지호',chatSub:'K-pop fan & Korean tutor 🎵',
+    spLabel:'💜 BTS Focus',
+    sys(s){
+      const b=`You are Ji-ho (지호), a fun and enthusiastic Korean tutor who is also a huge K-pop fan. Student speaks advanced English and is a complete beginner in Korean learning through K-pop.
+- Write Korean + (romanization) + [English] for every Korean phrase
+- Weave in K-pop references naturally: BTS, BLACKPINK, TWICE, Stray Kids, aespa, NewJeans, IVE
+- Use fandom vocab: oppa, unnie, bias, comeback, maknae, visual, lightstick, fancam, photocard
+- Gently correct mistakes inline
+- 2-4 sentences max, energetic and fun!`;
+      return ({free:b+'\nGreet student excitedly in Korean and ask about their favorite K-pop group!',cafe:b+'\nScene: You are a barista at a Seoul café popular with idol fans. Teach ordering vocab with K-pop references.',market:b+'\nScene: You are at a K-pop merch market. Teach shopping vocab using albums and photocards as examples.',greet:b+'\nFocus on greetings fans use at fansigns and fan meets. Teach formal and casual versions.',directions:b+'\nScene: Student wants to visit HYBE Building in Seoul. Teach directions with K-pop location refs.',special:b+'\nFocus exclusively on BTS. Teach Korean through BTS song lyrics (DNA, Spring Day, Boy With Luv, Dynamite, Butter, IDOL, Black Swan), member quotes from interviews and VLives, and ARMY fandom vocabulary. Reference each member by name and their iconic phrases.'})[s]||b;
+    },
+    cats:['Greetings','K-pop','BTS','ARMY','Fan Life'],
+    cards:{
+      'Greetings':[
+        {n:'안녕하세요',r:'an-nyeong-ha-se-yo',m:'Hello (formal)',e:'안녕하세요! 처음 뵙겠습니다.\nHello! Nice to meet you (formal — use at fan meets!)'},
+        {n:'안녕',r:'an-nyeong',m:'Hi / Bye (casual)',e:'"안녕!" — How idols greet fans at fansigns 💜\nCasual — use with friends your age.'},
+        {n:'감사합니다',r:'gam-sa-ham-ni-da',m:'Thank you (formal)',e:'도와주셔서 감사합니다.\nThank you for your help.\n(Use this with idols and elders!)'},
+        {n:'괜찮아요?',r:'gwaen-chan-a-yo?',m:'Are you okay? / I\'m fine',e:'괜찮아요? — BTS members ask fans this when they cry.\nAre you okay? / Yes, I\'m fine!'}
+      ],
+      'K-pop':[
+        {n:'오빠',r:'op-pa',m:'Older brother (female→male idol)',e:'BTS 오빠들 너무 좋아!\nI love the BTS oppas!\n(Female fans call male idols "oppa")'},
+        {n:'컴백',r:'keom-baek',m:'Comeback (new album/era)',e:'BTS 컴백 언제예요?\nWhen is the BTS comeback?'},
+        {n:'최애',r:'choe-ae',m:'Bias — your absolute favorite',e:'내 최애는 지민이에요.\nMy bias is Jimin.'},
+        {n:'대박',r:'dae-bak',m:'Amazing! / Jackpot! (slang)',e:'이 무대 대박이야!\nThis stage is AMAZING!'},
+        {n:'직캠',r:'jik-kaem',m:'Fancam',e:'정국 직캠 너무 잘생겼어!\nJungkook\'s fancam — he\'s so handsome!'},
+        {n:'응원봉',r:'eung-won-bong',m:'Lightstick (official fan light)',e:'아미봉 가져왔어요!\nI brought my ARMY Bomb!'}
+      ],
+      'BTS':[
+        {n:'보라해',r:'bo-ra-hae',m:'I purple you (BTS\'s own phrase)',e:'뷔가 처음 만든 말이에요.\nV invented this phrase in 2016.\n"I will trust and love you forever" 💜'},
+        {n:'전하고 싶은 말이 있어',r:'jeon-ha-go si-peon mal-i i-sseo',m:'I have something I want to tell you',e:'BTS의 "Boy With Luv" 가사\nFrom "Boy With Luv" lyrics.\nUsed to express heartfelt feelings.'},
+        {n:'봄날',r:'bom-nal',m:'Spring Day — a BTS song title',e:'"Spring Day" (봄날) is one of BTS\'s most beloved ballads.\n보고 싶다 = I miss you (from the lyrics)'},
+        {n:'땀, 눈물, 피',r:'ddam, nun-mul, pi',m:'Sweat, Tears, Blood (DNA lyrics)',e:'땀, 눈물, 피 — from the song "DNA"\nRepresents total dedication.\nNow used to mean "giving everything"'},
+        {n:'작은 것들을 위한 시',r:'ja-geun geot-deur-eul wi-han si',m:'A Poem for Small Things = Boy With Luv',e:'The Korean title of "Boy With Luv"\nLiterally: A poem for small, precious things.\nBeautiful alternate title!'},
+        {n:'고생했어',r:'go-saeng-hae-sseo',m:'You worked hard / Good job',e:'RM always says this to members.\n고생했어요 (formal) or 고생했어 (casual)\nBTS say this at the end of concerts.'}
+      ],
+      'ARMY':[
+        {n:'아미',r:'a-mi',m:'ARMY — BTS\'s official fandom name',e:'아미 사랑해요!\na-mi sa-rang-hae-yo!\nI love ARMY! (BTS says this every concert)'},
+        {n:'바이어스 렉커',r:'ba-i-eo-seu rek-keo',m:'Bias wrecker (someone ruining your bias)',e:'"세상에, 지민이 내 바이어스 렉커야!"\nOh my god, Jimin is my bias wrecker!\n(Your bias wrecker is dangerous 😅)'},
+        {n:'입덕',r:'ip-deok',m:'Falling into a fandom (becoming a fan)',e:'"나 BTS로 입덕했어!"\nna BTS-ro ip-deok-hae-sseo!\nI fell into BTS! I became an ARMY!'},
+        {n:'탈덕',r:'tal-deok',m:'Leaving a fandom (ex-fan)',e:'"절대 탈덕 못 해!"\njeo-ldae tal-deok mot hae!\nI can never leave this fandom!\n(ARMYs say this all the time 😂)'},
+        {n:'사생팬',r:'sa-saeng-paen',m:'Sasaeng (obsessive stalker fan)',e:'사생팬은 나쁜 행동이에요.\nBeing a sasaeng is bad behavior.\nReal ARMYs protect idols, not stalk them.'},
+        {n:'직관',r:'jik-gwan',m:'Watching a concert live in person',e:'"드디어 BTS 직관했어!!"\nI finally saw BTS live in concert!!\n직관 = the dream of every ARMY 🎤'}
+      ],
+      'Fan Life':[
+        {n:'사랑해요',r:'sa-rang-hae-yo',m:'I love you',e:'아미들 사랑해요! — BTS says at every concert.\nWe love you, ARMYs! 💜'},
+        {n:'보고 싶어요',r:'bo-go si-peo-yo',m:'I miss you',e:'"봄날" 가사: 보고 싶다, 보고 싶다...\nSpring Day lyrics: I miss you, I miss you...\nThe most emotional 3 words in K-pop.'},
+        {n:'진짜요?',r:'jin-jja-yo?',m:'Really? / Seriously?',e:'컴백이 다음 주야? 진짜요?!\nThe comeback is next week? Really?!'},
+        {n:'세상에',r:'se-sang-e',m:'Oh my goodness! / No way!',e:'세상에, 직접 봤어요!\nOh my god, I saw them in person!'}
+      ]
+    },
+    lessons:[
+      {n:'보라해 💜',r:'bo-ra-hae',m:'I purple you — V's phrase for eternal love'},
+      {n:'아미 사랑해요',r:'a-mi sa-rang-hae-yo',m:'I love ARMY (BTS says at every concert!)'},
+      {n:'고생했어요',r:'go-saeng-hae-sseo-yo',m:'Good job / You worked hard (BTS to each other)'},
+      {n:'보고 싶다',r:'bo-go sip-da',m:'I miss you (from Spring Day 봄날 lyrics)'},
+      {n:'입덕했어요',r:'ip-deok-hae-sseo-yo',m:'I became a fan / fell into the fandom'},
+      {n:'직관하고 싶어요',r:'jik-gwan-ha-go si-peo-yo',m:'I want to see them live in concert'},
+      {n:'대박이에요!',r:'dae-bak-i-e-yo!',m:'This is amazing! (reaction to BTS stages)'},
+      {n:'진짜요?!',r:'jin-jja-yo?!',m:'Really?! Seriously?! (fangirl essential 😂)'}
+    ],
+    shadow:[
+      {n:'보라해, 아미!',r:'bo-ra-hae, a-mi!',m:'I purple you, ARMY! (V's famous phrase 💜)'},
+      {n:'아미들 사랑해요!',r:'a-mi-deul sa-rang-hae-yo!',m:'I love ARMY! (BTS says this every concert)'},
+      {n:'고생했어요, 정말 감사해요.',r:'go-saeng-hae-sseo-yo, jeong-mal gam-sa-hae-yo.',m:'You worked hard, thank you so much.'},
+      {n:'보고 싶다, 보고 싶다.',r:'bo-go sip-da, bo-go sip-da.',m:'I miss you, I miss you. (Spring Day lyrics 봄날)'},
+      {n:'드디어 직관했어요!',r:'deu-di-eo jik-gwan-hae-sseo-yo!',m:'I finally saw them live in concert!'},
+      {n:'진짜 대박이에요, 이 무대!',r:'jin-jja dae-bak-i-e-yo, i mu-dae!',m:'This stage is truly amazing!'},
+      {n:'입덕한 것을 후회 안 해요.',r:'ip-deok-han geo-seul hu-hoe an hae-yo.',m:'I don't regret becoming a fan.'},
+      {n:'방탄소년단 최고예요!',r:'bang-tan-so-nyeon-dan choe-go-ye-yo!',m:'BTS is the best! (방탄소년단 = BTS full name)'}
+    ]
+  },
+  en:{
+    voiceLang:'en-US',chatAv:'A',chatName:'Alex — Business Coach',chatSub:'Fluency, pronunciation & professional English',
+    spLabel:'🎤 Pronunciation',
+    sys(s){
+      const b=`You are Alex, an expert Business English coach. Student already speaks advanced English and wants to sharpen vocabulary, business communication, and pronunciation for a creative agency professional context.
+- Teach power phrases, idioms, and business vocabulary
+- Give formal vs informal register comparisons with examples
+- Correct subtle stylistic or grammatical issues
+- Use real scenarios: client pitches, emails, presentations
+- 2-4 sentences max, practical and direct`;
+      return ({free:b+'\nAsk what aspect of business English they want to sharpen today.',cafe:b+'\nFocus on professional small talk: networking events, coffee meetings, breaking the ice.',market:b+'\nFocus on negotiation language, pricing conversations, and persuasion phrases.',greet:b+'\nFocus on professional introductions, elevator pitches, and first-impression phrases.',directions:b+'\nFocus on giving clear instructions and directions professionally in writing and speech.',special:b+'\nFocus on English pronunciation coaching: word stress, connected speech, minimal pairs, and natural rhythm. Give spoken exercises and corrections.'})[s]||b;
+    },
+    cats:['Idioms','Business','Vocabulary','Pronunciation','Writing'],
+    cards:{
+      'Idioms':[
+        {n:'Hit the nail on the head',r:'',m:'To be exactly right',e:'"Your analysis hit the nail on the head — the problem is with onboarding."'},
+        {n:'Bite the bullet',r:'',m:'To endure something difficult bravely',e:'"We need to bite the bullet and rewrite the codebase."'},
+        {n:'The ball is in your court',r:'',m:"It's your turn to act or decide",e:'"I sent the proposal — the ball is in their court now."'},
+        {n:'Burn the midnight oil',r:'',m:'To work very late into the night',e:'"The team burned the midnight oil to hit the launch deadline."'}
+      ],
+      'Business':[
+        {n:'Leverage',r:'',m:'To use something to maximum advantage',e:'"We can leverage our existing audience for the new launch."'},
+        {n:'Bandwidth',r:'',m:'Capacity to take on more tasks',e:'"I don\'t have the bandwidth for that project this sprint."'},
+        {n:'Move the needle',r:'',m:'To make a significant measurable impact',e:'"Which initiatives will actually move the needle on revenue?"'},
+        {n:'Circle back',r:'',m:'To return to a topic later',e:'"Let\'s circle back on pricing at the end of the call."'},
+        {n:'Low-hanging fruit',r:'',m:'Easy wins requiring little effort',e:'"Let\'s tackle the low-hanging fruit before the bigger projects."'},
+        {n:'Deliverable',r:'',m:'A measurable output or result',e:'"The key deliverable for Q2 is the redesigned onboarding flow."'}
+      ],
+      'Vocabulary':[
+        {n:'Serendipity',r:'/ˌser.ɪnˈdɪp.ɪ.ti/',m:'A happy accident or pleasant surprise',e:'"It was pure serendipity that we ended up at the same conference."'},
+        {n:'Succinct',r:'/səkˈsɪŋkt/',m:'Briefly and clearly expressed',e:'"Keep your pitch succinct — you have exactly two minutes."'},
+        {n:'Juxtapose',r:'/ˈdʒʌk.stə.poʊz/',m:'To place side by side for contrast',e:'"The deck juxtaposes last year\'s results with this quarter\'s growth."'},
+        {n:'Nuance',r:'/ˈnjuː.ɑːns/',m:'A subtle difference in meaning or tone',e:'"The nuance between \'affect\' and \'effect\' trips up many native speakers."'}
+      ],
+      'Pronunciation':[
+        {n:'Entrepreneur',r:'/ˌɒn.trə.prəˈnɜː/',m:'Stress on last syllable: en-tre-pre-NEUR',e:'Common error: stressing the first syllable.\nCorrect: on-truh-pruh-NUR (French origin!)'},
+        {n:'Particularly',r:'/pəˈtɪk.jʊ.lə.li/',m:'5 syllables: par-TIC-u-lar-ly',e:'Often mispronounced as "particulary" — don\'t skip the "lar"!'},
+        {n:'The schwa /ə/',r:'Most common English sound',m:'Unstressed vowels reduce to "uh"',e:'"about" = uh-BOUT\n"camera" = CAM-ruh\nReducing stress = sounding natural!'},
+        {n:'th — voiced vs voiceless',r:'/ð/ vs /θ/',m:'"this" (voiced) vs "think" (voiceless)',e:'"this" — tongue on teeth, voice ON.\n"think" — tongue on teeth, voice OFF.'}
+      ],
+      'Writing':[
+        {n:'Nevertheless',r:'',m:'In spite of that; however (formal)',e:'"The data was incomplete. Nevertheless, the trend was clear."'},
+        {n:'Furthermore',r:'',m:'In addition; moreover',e:'"The cost decreased. Furthermore, quality improved significantly."'},
+        {n:'Albeit',r:'/ɔːlˈbiː.ɪt/',m:'Although; even though',e:'"It was a success, albeit a slow one."'},
+        {n:'Henceforth',r:'',m:'From this time on (very formal)',e:'"Henceforth, all requests must go through the new system."'}
+      ]
+    },
+    lessons:[
+      {n:'Break a leg!',r:'',m:'Good luck! (theater origin)'},
+      {n:'Under the weather',r:'',m:'Feeling ill or unwell'},
+      {n:'The elephant in the room',r:'',m:'An obvious problem no one mentions'},
+      {n:'Cost an arm and a leg',r:'',m:'Very expensive'},
+      {n:'On the same page',r:'',m:'In agreement; mutual understanding'},
+      {n:'A blessing in disguise',r:'',m:'Something good that seemed bad at first'},
+      {n:'Get out of hand',r:'',m:'To become uncontrollable'},
+      {n:'Touch base',r:'',m:'To make brief contact with someone'}
+    ],
+    shadow:[
+      {n:"I'd like to circle back on that point.",r:'',m:'Professional way to revisit a topic'},
+      {n:"Let's touch base early next week.",r:'',m:"Let's make brief contact next week"},
+      {n:'We need to leverage our existing client base.',r:'',m:'Use our current clients strategically'},
+      {n:'The ball is in your court — let me know.',r:'',m:"It's your turn to decide"},
+      {n:'Could you elaborate on that a bit further?',r:'',m:'Please explain in more detail'},
+      {n:"This is a real game-changer for our strategy.",r:'',m:'This significantly changes our approach'},
+      {n:"We're looking to move the needle this quarter.",r:'',m:'We want to make a significant impact'},
+      {n:"Let's take this offline and discuss later.",r:'',m:"Let's talk about this separately"}
+    ]
+  }
+};
+
+// STATE
+let L='zh',mode='flash',cat='Greetings',ci=0,flipped=false,score=0;
+let apiKey=localStorage.getItem('lingua_k')||'';
+let hist={zh:[],ko:[],en:[]};
+let scenario='free';
+let recOn=false,shRecOn=false;
+let recog=null,shRecog=null;
+let shIdx=0;
+let streak=parseInt(localStorage.getItem('lingua_str')||'0');
+
+// PROGRESS & LEVEL SYSTEM
+const LEVELS=[
+  {label:'Novice',min:0},
+  {label:'Beginner',min:0.2},
+  {label:'Elementary',min:0.4},
+  {label:'Intermediate',min:0.6},
+  {label:'Advanced',min:0.8}
+];
+let progress=JSON.parse(localStorage.getItem('lingua_progress')||'{}');
+
+function ensureProg(l){if(!progress[l])progress[l]={mastered:{},seen:{}};}
+function saveProg(){localStorage.setItem('lingua_progress',JSON.stringify(progress));}
+function totalCards(l){return Object.values(D[l].cards).flat().length;}
+function masteredCount(l){ensureProg(l);return Object.keys(progress[l].mastered).length;}
+function cardKey(c,i){return c+':'+i;}
+function isMastered(c,i){ensureProg(L);return !!progress[L].mastered[cardKey(c,i)];}
+
+function getLevelIdx(l){
+  const pct=totalCards(l)>0?masteredCount(l)/totalCards(l):0;
+  for(let i=LEVELS.length-1;i>=0;i--){if(pct>=LEVELS[i].min)return i;}
+  return 0;
+}
+
+function updLevel(){
+  const idx=getLevelIdx(L);
+  const total=totalCards(L);
+  const m=masteredCount(L);
+  const badge=document.getElementById('lv-badge');
+  const xp=document.getElementById('lv-xp');
+  badge.textContent='Lv.'+(idx+1)+' '+LEVELS[idx].label;
+  badge.className='lv-badge '+L;
+  xp.textContent=m+' / '+total;
+}
+
+// Gemini API
+const GEMINI_URL=k=>`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`;
+
+function init(){
+  updStreak();
+  if(apiKey) document.getElementById('api-note').classList.add('hidden');
+  updScenarioLabel();
+  updLevel();
+  renderCats(); renderCard(); renderLessons(); renderShadow();
+  setupRecog();
+  startChat();
+}
+
+function updStreak(){document.getElementById('stk').textContent=streak+' day streak';}
+
+function markAct(){
+  const t=new Date().toDateString(),l=localStorage.getItem('lingua_day');
+  if(l!==t){streak++;localStorage.setItem('lingua_str',streak);localStorage.setItem('lingua_day',t);updStreak();}
+}
+
+function updScenarioLabel(){
+  document.getElementById('sp-opt').textContent=D[L].spLabel;
+}
+
+// LANG SWITCH
+function switchLang(l){
+  L=l; cat=D[l].cats[0]; ci=0; flipped=false; shIdx=0;
+  const ls=['zh','ko','en'];
+  document.querySelectorAll('.lang-tab').forEach((t,i)=>{t.className='lang-tab';if(ls[i]===l)t.classList.add('act-'+l);});
+  ['flash','shadow','chat','lesson'].forEach(m=>{
+    const d=document.getElementById('d-'+m);
+    if(d){d.className='dot '+(l==='zh'?'dz':l==='ko'?'dk':'de');}
+  });
+  document.getElementById('send').className='send-btn'+(l!=='zh'?' '+l:'');
+  const d=D[l];
+  document.getElementById('av').textContent=d.chatAv;
+  document.getElementById('av').className='av '+l;
+  document.getElementById('ai-name').textContent=d.chatName;
+  document.getElementById('ai-sub').textContent=d.chatSub;
+  document.getElementById('pf').className='pfill'+(l!=='zh'?' '+l:'');
+  document.getElementById('les-badge').className='les-badge '+l;
+  document.getElementById('sh-listen').className='sh-btn p'+l;
+  updScenarioLabel();
+  updLevel();
+  renderCats(); renderCard(); renderLessons(); renderShadow();
+  document.getElementById('msgs').innerHTML='';
+  hist[l]=[];
+  startChat();
+}
+
+// MODE SWITCH
+function switchMode(m){
+  mode=m;
+  ['flash','shadow','chat','lesson'].forEach(x=>{
+    document.getElementById('p-'+x).classList.toggle('hidden',x!==m);
+    document.getElementById('mb-'+x).classList.toggle('active',x===m);
+  });
+}
+
+// FLASHCARDS
+function renderCats(){
+  const el=document.getElementById('cat-pills');
+  el.innerHTML='';
+  D[L].cats.forEach(c=>{
+    const p=document.createElement('button');
+    p.className='pill'+(c===cat?' p'+(L==='zh'?'z':L==='ko'?'k':'e'):'');
+    p.textContent=c;
+    p.onclick=()=>{cat=c;ci=0;flipped=false;renderCats();renderCard();};
+    el.appendChild(p);
+  });
+}
+
+function getCards(){return D[L].cards[cat]||[];}
+
+function renderCard(){
+  const cards=getCards();if(!cards.length)return;
+  const c=cards[ci];
+  document.getElementById('cc').textContent=c.n;
+  document.getElementById('cr').textContent=c.r||'';
+  document.getElementById('cr').style.display=c.r?'':'none';
+  document.getElementById('cm').textContent=c.m;
+  document.getElementById('ce').textContent=c.e||'';
+  document.getElementById('ci').classList.toggle('flipped',flipped);
+  document.getElementById('btns-f').classList.toggle('hidden',flipped);
+  document.getElementById('btns-b').classList.toggle('hidden',!flipped);
+  const total=cards.length;
+  const mastered=isMastered(cat,ci);
+  document.getElementById('cnt').textContent='Card '+(ci+1)+' of '+total+(mastered?' ✓':'');
+  const lvColor=L==='ko'?'var(--ko)':L==='en'?'var(--en)':'var(--zh)';
+  document.getElementById('cnt').style.color=mastered?lvColor:'var(--text3)';
+  document.getElementById('pf').style.width=((ci/total)*100)+'%';
+}
+
+function flipCard(){flipped=!flipped;renderCard();markAct();}
+
+function nextCard(ok){
+  const cards=getCards();
+  ensureProg(L);
+  const k=cardKey(cat,ci);
+  if(ok){score++;progress[L].mastered[k]=true;}
+  else{delete progress[L].mastered[k];}
+  saveProg();
+  updLevel();
+  ci=(ci+1)%cards.length;
+  flipped=false;
+  if(ci===0){toast('🎉 Done! '+score+'/'+cards.length+' correct');score=0;}
+  renderCard();
+}
+
+function speakCur(){
+  const cards=getCards();if(!cards.length)return;
+  speak(cards[ci].n,D[L].voiceLang);
+}
+
+// TTS
+function speak(text,lang){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang;u.rate=0.85;
+  const v=window.speechSynthesis.getVoices();
+  const match=v.find(x=>x.lang.startsWith(lang.split('-')[0]));
+  if(match)u.voice=match;
+  window.speechSynthesis.speak(u);
+}
+
+// SHADOWING
+function renderShadow(){
+  const phrases=D[L].shadow;if(!phrases||!phrases.length)return;
+  const p=phrases[shIdx];
+  document.getElementById('sh-nat').textContent=p.n;
+  document.getElementById('sh-rom').textContent=p.r||'';
+  document.getElementById('sh-rom').style.display=p.r?'':'none';
+  document.getElementById('sh-en').textContent=p.m;
+  document.getElementById('sh-res').className='sh-res';
+}
+
+function listenSh(){
+  const phrases=D[L].shadow;if(!phrases)return;
+  speak(phrases[shIdx].n,D[L].voiceLang);
+  markAct();
+}
+
+function prevSh(){const p=D[L].shadow;shIdx=(shIdx-1+p.length)%p.length;renderShadow();}
+function nextSh(){const p=D[L].shadow;shIdx=(shIdx+1)%p.length;renderShadow();}
+
+function toggleShMic(){
+  if(!shRecog){toast('Speech recognition not supported in this browser');return;}
+  if(shRecOn){
+    shRecog.stop();shRecOn=false;
+    document.getElementById('sh-rec').className='sh-btn';
+    document.getElementById('sh-rec').textContent='🎤 Repeat';
+  } else {
+    shRecog.lang=D[L].voiceLang;
+    shRecog.start();shRecOn=true;
+    document.getElementById('sh-rec').className='sh-btn rec';
+    document.getElementById('sh-rec').textContent='🔴 Listening...';
+    toast('🎤 Speak now!');
+  }
+}
+
+function scoreSh(transcript){
+  const phrases=D[L].shadow;
+  const target=phrases[shIdx].n.toLowerCase();
+  const heard=transcript.toLowerCase();
+  const tw=target.replace(/[^\w\s　-鿿가-힯]/g,'').split(/\s+/).filter(Boolean);
+  const hw=heard.replace(/[^\w\s　-鿿가-힯]/g,'').split(/\s+/).filter(Boolean);
+  let m=0;
+  hw.forEach(w=>{if(tw.some(t=>t.includes(w)||w.includes(t)))m++;});
+  const pct=tw.length>0?Math.min(100,Math.round((m/tw.length)*100)):50;
+  const r=document.getElementById('sh-res');
+  const sc=document.getElementById('sh-score');
+  const hd=document.getElementById('sh-heard');
+  if(pct>=70){r.className='sh-res show good';sc.className='sh-score g';sc.textContent=pct+'% — Great!';}
+  else if(pct>=40){r.className='sh-res show ok';sc.className='sh-score o';sc.textContent=pct+'% — Keep going!';}
+  else{r.className='sh-res show bad';sc.className='sh-score b';sc.textContent=pct+'% — Try again!';}
+  hd.textContent='You said: "'+transcript+'"';
+}
+
+// SPEECH RECOGNITION
+function setupRecog(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('mic').style.display='none';return;}
+  recog=new SR();recog.continuous=false;recog.interimResults=false;
+  recog.onresult=e=>{const t=e.results[0][0].transcript;document.getElementById('ci2').value=t;recOn=false;document.getElementById('mic').classList.remove('rec');sendMsg();};
+  recog.onerror=recog.onend=()=>{recOn=false;document.getElementById('mic').classList.remove('rec');};
+  shRecog=new SR();shRecog.continuous=false;shRecog.interimResults=false;
+  shRecog.onresult=e=>{const t=e.results[0][0].transcript;shRecOn=false;document.getElementById('sh-rec').className='sh-btn';document.getElementById('sh-rec').textContent='🎤 Repeat';scoreSh(t);markAct();};
+  shRecog.onerror=shRecog.onend=()=>{shRecOn=false;document.getElementById('sh-rec').className='sh-btn';document.getElementById('sh-rec').textContent='🎤 Repeat';};
+}
+
+function toggleMic(){
+  if(!recog)return;
+  if(recOn){recog.stop();recOn=false;document.getElementById('mic').classList.remove('rec');}
+  else{recog.lang=D[L].voiceLang;recog.start();recOn=true;document.getElementById('mic').classList.add('rec');toast('🎤 Listening...');}
+}
+
+// LESSONS
+function renderLessons(){
+  const list=document.getElementById('ph-list');
+  list.innerHTML='';
+  D[L].lessons.forEach(p=>{
+    const item=document.createElement('div');
+    item.className='phrase-item';
+    item.innerHTML='<div class="ph-main"><div class="ph-nat">'+p.n+'</div>'+(p.r?'<div class="ph-rom">'+p.r+'</div>':'')+'<div class="ph-en">'+p.m+'</div></div><button class="ph-spk" onclick="speak(\''+p.n.replace(/'/g,"\\'")+"','"+D[L].voiceLang+"')\">🔊</button>";
+    list.appendChild(item);
+  });
+}
+
+// CHAT — Google Gemini API
+function changeScenario(){
+  scenario=document.getElementById('sc-sel').value;
+  document.getElementById('msgs').innerHTML='';
+  hist[L]=[];
+  startChat();
+}
+
+async function startChat(){
+  if(!apiKey){addMsg('ai','Hi! 👋 I\'m '+D[L].chatName.split('—')[0].trim()+'. Add your Gemini API key above to start chatting!');return;}
+  const t=showTyping();
+  try{
+    const res=await fetch(GEMINI_URL(apiKey),{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        systemInstruction:{parts:[{text:D[L].sys(scenario)}]},
+        contents:[{role:'user',parts:[{text:'Start the lesson now.'}]}],
+        generationConfig:{maxOutputTokens:300}
+      })
+    });
+    const d=await res.json();
+    hideTyping(t);
+    if(d.candidates&&d.candidates[0]){
+      const x=d.candidates[0].content.parts[0].text;
+      addMsg('ai',x,true);
+      hist[L].push({role:'user',parts:[{text:'Start the lesson now.'}]});
+      hist[L].push({role:'model',parts:[{text:x}]});
+    } else if(d.error){
+      addMsg('ai','⚠️ '+(d.error.message||'API error. Check your Gemini key.'));
+    }
+  }catch(e){hideTyping(t);addMsg('ai','Connection error. Check your API key and try again.');}
+}
+
+async function sendMsg(){
+  const inp=document.getElementById('ci2');
+  const text=inp.value.trim();if(!text)return;
+  if(!apiKey){toast('Add your Gemini API key first! ☝️');return;}
+  inp.value='';resize(inp);
+  addMsg('user',text);
+  hist[L].push({role:'user',parts:[{text:text}]});
+  markAct();
+  const t=showTyping();
+  const sb=document.getElementById('send');sb.disabled=true;
+  try{
+    const res=await fetch(GEMINI_URL(apiKey),{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        systemInstruction:{parts:[{text:D[L].sys(scenario)}]},
+        contents:hist[L],
+        generationConfig:{maxOutputTokens:400}
+      })
+    });
+    const d=await res.json();
+    hideTyping(t);sb.disabled=false;
+    if(d.candidates&&d.candidates[0]){
+      const x=d.candidates[0].content.parts[0].text;
+      addMsg('ai',x,true);
+      hist[L].push({role:'model',parts:[{text:x}]});
+    } else if(d.error){
+      addMsg('ai','⚠️ '+(d.error.message||'API error.'));
+    }
+  }catch(e){hideTyping(t);sb.disabled=false;addMsg('ai','Network error. Please try again.');}
+}
+
+function addMsg(role,text,canSpeak=false){
+  const c=document.getElementById('msgs');
+  const div=document.createElement('div');div.className='msg '+role;
+  const b=document.createElement('div');
+  b.className='bubble'+(role==='user'&&L!=='zh'?' '+L:'');
+  b.textContent=text;div.appendChild(b);
+  if(canSpeak&&role==='ai'){const s=document.createElement('button');s.className='spkbtn';s.textContent='🔊';s.onclick=()=>speak(text,D[L].voiceLang);div.appendChild(s);}
+  c.appendChild(div);c.scrollTop=c.scrollHeight;
+}
+
+function showTyping(){
+  const c=document.getElementById('msgs');
+  const div=document.createElement('div');div.className='msg ai';
+  const ind=document.createElement('div');ind.className='typing on';
+  ind.innerHTML='<div class="tdot"></div><div class="tdot"></div><div class="tdot"></div>';
+  div.appendChild(ind);c.appendChild(div);c.scrollTop=c.scrollHeight;return div;
+}
+function hideTyping(el){if(el&&el.parentNode)el.parentNode.removeChild(el);}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function resize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,80)+'px';}
+
+function saveKey(){
+  const v=document.getElementById('api-inp').value.trim();
+  if(v.length<10){toast('Invalid key format');return;}
+  apiKey=v;localStorage.setItem('lingua_k',apiKey);
+  document.getElementById('api-note').classList.add('hidden');
+  toast('✓ Gemini API key saved');
+  document.getElementById('msgs').innerHTML='';hist[L]=[];startChat();
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+if(window.speechSynthesis)window.speechSynthesis.onvoiceschanged=()=>{};
+init();
+</script>
+</body>
+</html>

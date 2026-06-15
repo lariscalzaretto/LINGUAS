@@ -1,0 +1,16 @@
+# Chaves de API — nunca versionar
+config/api-key.txt
+config/*.key
+.env
+.env.local
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
